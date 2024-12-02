@@ -20,13 +20,13 @@ where
             }
         }
         let abs_diff = diff.abs();
-        if abs_diff < 1 || abs_diff > 3 {
+        if !(1..=3).contains(&abs_diff) {
             return false;
         }
 
         last_number = number;
     }
-    return true;
+    true
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -38,7 +38,7 @@ pub fn part_one(input: &str) -> Option<u32> {
             out += 1;
         }
     }
-    return Some(out);
+    Some(out)
 }
 
 fn is_safe_two<I>(numbers: I, skipped_index: Option<usize>) -> bool
@@ -60,7 +60,7 @@ where
         }
         let diff = last_number - number;
 
-        if direction == None {
+        if direction.is_none() {
             direction = Some(diff.signum());
         } else if Some(diff.signum()) != direction {
             if skipped_index.is_some() {
@@ -73,7 +73,7 @@ where
         }
 
         let abs_diff = diff.abs();
-        if abs_diff < 1 || abs_diff > 3 {
+        if !(1..=3).contains(&abs_diff) {
             if skipped_index.is_some() {
                 return false;
             }
@@ -82,7 +82,7 @@ where
 
         last_number = number;
     }
-    return true;
+    true
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -94,7 +94,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             out += 1;
         }
     }
-    return Some(out);
+    Some(out)
 }
 
 #[cfg(test)]
