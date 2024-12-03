@@ -54,6 +54,18 @@ where
     let mut last_number = work_numbers.next().unwrap().1;
     let mut direction = None;
 
+    let check_error = |i| {
+        if skipped_index.is_some() {
+            return false;
+        }
+        if (1..=2).contains(&i)
+            && (is_safe_two(numbers.clone(), Some(0)) || is_safe_two(numbers.clone(), Some(1)))
+        {
+            return true;
+        }
+        is_safe_two(numbers.clone(), Some(i))
+    };
+
     for (i, number) in work_numbers {
         if skipped_index == Some(i) {
             continue;
@@ -63,23 +75,12 @@ where
         if direction.is_none() {
             direction = Some(diff.signum());
         } else if Some(diff.signum()) != direction {
-            if skipped_index.is_some() {
-                return false;
-            }
-            if i == 2
-                && (is_safe_two(numbers.clone(), Some(0)) || is_safe_two(numbers.clone(), Some(1)))
-            {
-                return true;
-            }
-            return is_safe_two(numbers.clone(), Some(i));
+            return check_error(i);
         }
 
         let abs_diff = diff.abs();
         if !(1..=3).contains(&abs_diff) {
-            if skipped_index.is_some() {
-                return false;
-            }
-            return is_safe_two(numbers.clone(), Some(i));
+            return check_error(i);
         }
 
         last_number = number;
@@ -129,7 +130,7 @@ mod tests {
         let input = "20 11 8 7 6";
         let split_line = input.split(' ');
         let numbers = split_line.map(|s| s.parse::<i32>().unwrap());
-        assert_eq!(is_safe_two(numbers, None), false);
+        assert_eq!(is_safe_two(numbers, None), true);
     }
 
     #[test]
