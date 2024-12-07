@@ -1,39 +1,25 @@
 advent_of_code::solution!(4);
 
 fn count_xmas<I: Iterator<Item = u8>>(chars: I) -> u32 {
-    let mut out = 0;
-    let search = "XMAS".as_bytes();
-    let search_reverse = "SAMX".as_bytes();
-    let mut found = 0;
-    let mut found_reverse = 0;
-    for c in chars {
-        if c == search[found] {
-            found += 1;
-            if found == 4 {
-                out += 1;
-                found = 0;
-            }
-        } else {
-            found = 0;
-            if c == search[found] {
-                found += 1;
-            }
-        }
+    let mut count = 0;
+    let patterns = ["XMAS".as_bytes(), "SAMX".as_bytes()];
+    let mut states = vec![0; patterns.len()];
 
-        if c == search_reverse[found_reverse] {
-            found_reverse += 1;
-            if found_reverse == 4 {
-                out += 1;
-                found_reverse = 0;
-            }
-        } else {
-            found_reverse = 0;
-            if c == search_reverse[found_reverse] {
-                found_reverse += 1;
+    for c in chars {
+        for (i, pattern) in patterns.iter().enumerate() {
+            if c == pattern[states[i]] {
+                states[i] += 1;
+                if states[i] == pattern.len() {
+                    count += 1;
+                    states[i] = 0;
+                }
+            } else {
+                states[i] = if c == pattern[0] { 1 } else { 0 };
             }
         }
     }
-    out
+
+    count
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
