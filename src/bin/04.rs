@@ -51,7 +51,40 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut out = 0;
+    let columns = input.find('\n').unwrap();
+    let chars: Vec<Vec<u8>> = input
+        .lines()
+        .map(|l| l.as_bytes().iter().cloned().collect())
+        .collect();
+
+    let rows = chars.len();
+
+    for y in 1..rows - 1 {
+        for x in 1..columns - 1 {
+            let c = chars[y][x];
+            if c != b'A' {
+                continue;
+            }
+
+            let top_left = chars[y - 1][x - 1];
+            let top_right = chars[y - 1][x + 1];
+            let bottom_left = chars[y + 1][x - 1];
+            let bottom_right = chars[y + 1][x + 1];
+
+            let down_cross_valid = (top_left == b'M' && bottom_right == b'S')
+                || (top_left == b'S' && bottom_right == b'M');
+
+            let up_cross_valid = (top_right == b'M' && bottom_left == b'S')
+                || (top_right == b'S' && bottom_left == b'M');
+
+            if down_cross_valid && up_cross_valid {
+                out += 1;
+            }
+        }
+    }
+
+    Some(out)
 }
 
 #[cfg(test)]
