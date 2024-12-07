@@ -6,8 +6,8 @@ fn count_xmas<I: Iterator<Item = u8>>(chars: I) -> u32 {
     let search_reverse = "SAMX".as_bytes();
     let mut found = 0;
     let mut found_reverse = 0;
-    for char in chars {
-        if char == search[found] {
+    for c in chars {
+        if c == search[found] {
             found += 1;
             if found == 4 {
                 out += 1;
@@ -15,12 +15,12 @@ fn count_xmas<I: Iterator<Item = u8>>(chars: I) -> u32 {
             }
         } else {
             found = 0;
-            if char == search[found] {
+            if c == search[found] {
                 found += 1;
             }
         }
 
-        if char == search_reverse[found_reverse] {
+        if c == search_reverse[found_reverse] {
             found_reverse += 1;
             if found_reverse == 4 {
                 out += 1;
@@ -28,7 +28,7 @@ fn count_xmas<I: Iterator<Item = u8>>(chars: I) -> u32 {
             }
         } else {
             found_reverse = 0;
-            if char == search_reverse[found_reverse] {
+            if c == search_reverse[found_reverse] {
                 found_reverse += 1;
             }
         }
@@ -39,49 +39,26 @@ fn count_xmas<I: Iterator<Item = u8>>(chars: I) -> u32 {
 pub fn part_one(input: &str) -> Option<u32> {
     let mut out = 0;
     let columns = input.find('\n').unwrap();
-    let chars: Vec<u8> = input
-        .as_bytes()
-        .iter()
-        .cloned()
-        .filter(|&c| c != b'\n' && c != b'\r')
+    let chars: Vec<Vec<u8>> = input
+        .lines()
+        .map(|l| l.as_bytes().iter().cloned().collect())
         .collect();
 
-    let chars_len = chars.len();
-    let rows = chars_len / columns;
+    let rows = chars.len();
 
     for y in 0..rows {
-        let i = y * columns;
-        out += count_xmas((i..(i + columns)).map(|j| chars[j]));
+        out += count_xmas((0..rows).map(|x| chars[y][x]));
 
-        let first_step_count = (chars_len - i) / columns;
-        let second_sted_count = columns - first_step_count;
+        let steps = rows - y;
+        out += count_xmas((0..steps).map(|step| chars[step + y][step]));
+        out += count_xmas((1..steps).map(|step| chars[step + y][columns - step - 1]));
 
-        {
-            let step = columns + 1;
-
-            let step_range_1 = i..(i + step * first_step_count);
-            let step_range_2_start = step_range_1.end;
-            out += count_xmas(step_range_1.step_by(step).map(|j| chars[j]));
-
-            let step_range_2 = step_range_2_start..(step_range_2_start + step * second_sted_count);
-            out += count_xmas(step_range_2.step_by(step).map(|j| chars[j % chars_len]));
-        }
-
-        {
-            let step = columns - 1;
-            let up_i = i + step;
-
-            let step_range_1 = up_i..(up_i + step * first_step_count);
-            let step_range_2_start = step_range_1.end;
-            out += count_xmas(step_range_1.step_by(step).map(|j| chars[j]));
-
-            let step_range_2 = step_range_2_start..(step_range_2_start + step * second_sted_count);
-            out += count_xmas(step_range_2.step_by(step).map(|j| chars[j % chars_len]));
-        };
+        out += count_xmas((0..=y).map(|step| chars[y - step][step]));
+        out += count_xmas((1..=y).map(|step| chars[y - step][columns - step - 1]));
     }
 
     for x in 0..columns {
-        out += count_xmas((x..chars_len).step_by(columns).map(|j| chars[j]));
+        out += count_xmas((0..columns).map(|y| chars[y][x]));
     }
 
     Some(out)
