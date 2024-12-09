@@ -7,11 +7,13 @@ struct Rule {
 
 impl Rule {
     fn is_valid(&self, update: &Vec<u32>) -> bool {
-        let a_index = update.iter().position(|&n| n == self.a);
-        let b_index = update.iter().position(|&n| n == self.b);
-        if a_index.is_some() && b_index.is_some() {
-            if a_index >= b_index {
+        let mut b_found = false;
+        for entry in update {
+            if entry == &self.a && b_found {
                 return false;
+            }
+            if entry == &self.b {
+                b_found = true
             }
         }
         true
